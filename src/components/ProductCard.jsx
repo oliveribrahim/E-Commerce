@@ -2,17 +2,28 @@ import React from "react";
 
 export default function ProductCard({ product, onAdd }) {
     return (
-        <div className="bg-white shadow rounded p-4 flex flex-col">
-            <img src={product.image} alt={product.title} className="h-40 object-contain mb-3" />
-            <h3 className="text-sm font-semibold mb-1 line-clamp-2">{product.title}</h3>
-            <p className="text-xs text-gray-500 mb-3 line-clamp-2">{product.description}</p>
-            <div className="mt-auto flex items-center justify-between">
-                <span className="font-bold">${product.price}</span>
+        <div className="bg-white shadow-md rounded-xl p-6 flex flex-col transition-all duration-300 hover:shadow-xl hover:scale-105">
+            <div className="mb-4 flex-shrink-0">
+                <img 
+                    src={product.image} 
+                    alt={product.title} 
+                    className="w-full h-48 object-contain rounded-lg" 
+                />
+            </div>
+            <h3 className="text-lg font-semibold mb-2 text-gray-800 line-clamp-2 min-h-[3.5rem]">
+                {product.title}
+            </h3>
+            <p className="text-sm text-gray-600 mb-4 line-clamp-2 flex-grow">
+                {product.description}
+            </p>
+            <div className="mt-auto flex items-center justify-between pt-4 border-t border-gray-200">
+                <span className="text-2xl font-bold text-blue-600">
+                    ${product.price.toFixed(2)}
+                </span>
                 <button
                     onClick={() => onAdd(product)}
-                    className="bg-blue-600 text-white text-sm px-3 py-1 rounded hover:bg-blue-700"
-                >
-                    Add
+                    className="bg-blue-600 text-white px-6 py-2 rounded-lg font-semibold transition-all duration-200 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 active:bg-blue-800">
+                    Add to Cart
                 </button>
             </div>
         </div>

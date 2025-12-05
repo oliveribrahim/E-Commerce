@@ -1,58 +1,91 @@
-import React, { createContext, useContext, useState, useEffect } from "react";
+import React, {createContext, useContext, useEffect, useState} from "react";
 
 const CartContext = createContext();
 
-export function CartProvider({ children }) {
-    const [cart, setCart] = useState([]);
+export function CartProvider({children}) {
     const [purchases, setPurchases] = useState(() => {
         // persist purchases
         const raw = localStorage.getItem("purchases");
-        return raw ? JSON.parse(raw) : [];
+        if (!raw) return [];
+        
+        try {
+            const parsed = JSON.parse(raw);
+            // Filter out any null, undefined, or invalid items
+            return Array.isArray(parsed) 
+                ? parsed.filter(item => item && item.id && item.purchaseId)
+                : [];
+        } catch (error) {
+            console.error("Error parsing purchases from localStorage:", error);
+            return [];
+        }
     });
 
     useEffect(() => {
         localStorage.setItem("purchases", JSON.stringify(purchases));
     }, [purchases]);
 
-    function addToCart(product) {
-        setCart(prev => {
-            const found = prev.find(p => p.id === product.id);
-            if (found) {
-                return prev.map(p => p.id === product.id ? { ...p, qty: p.qty + 1 } : p);
+    function addToPurchases(product) {
+        if (!product || !product.id) return; // safety check
+
+        setPurchases(prev => {
+
+            const cleanPrev = prev.filter(item => item && item.id && item.purchaseId);
+            const existing = prev.find(item => item?.id === product.id);
+
+            if (existing) {
+                return cleanPrev.map(item =>
+                    item.id === product.id ? {...item, qty: (item.qty || 0) + 1} : item );
+            } else {
+                const purchaseItem = {
+                    ...product,
+                    purchaseId: Date.now(),
+                    purchaseDate: new Date().toISOString(),
+                    qty: 1
+                };
+                return [purchaseItem, ...prev];
             }
-            return [...prev, { ...product, qty: 1 }];
         });
     }
 
-    function removeFromCart(productId) {
-        setCart(prev => prev.filter(p => p.id !== productId));
+    function incrementQty(purchaseId) {
+        setPurchases(prev => prev.map(
+            item => item.purchaseId === purchaseId ? 
+            {...item, qty: (item.qty || 0) + 1} : item));
     }
 
-    function clearCart() {
-        setCart([]);
+    function decrementQty(purchaseId) {
+        setPurchases(prev =>
+            prev
+                .map(item => {
+                    if (item.purchaseId === purchaseId) {
+                        const newQty = (item.qty || 0) - 1;
+                        if (newQty <= 0) {
+                            return null;
+                        }
+                        return {...item, qty: newQty};
+                    }
+                    return item;
+                })
+                .filter(Boolean)
+        );
+    }
+    
+
+    function removeFromPurchases(purchaseId) {
+        setPurchases(prev => prev.filter(p => p.purchaseId !== purchaseId));
     }
 
-    function checkout() {
-        if (cart.length === 0) return;
-        const order = {
-            id: Date.now(),
-            date: new Date().toISOString(),
-            items: cart,
-            total: cart.reduce((s, it) => s + it.price * it.qty, 0),
-        };
-        setPurchases(prev => [order, ...prev]);
-        clearCart();
-        return order;
+    function removeAllPurchases(purchaseId) {
+        setPurchases([]);
     }
-
     return (
         <CartContext.Provider value={{
-            cart,
             purchases,
-            addToCart,
-            removeFromCart,
-            clearCart,
-            checkout
+            addToPurchases,
+            removeFromPurchases,
+            incrementQty,
+            decrementQty,
+            removeAllPurchases
         }}>
             {children}
         </CartContext.Provider>
