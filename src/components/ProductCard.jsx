@@ -1,6 +1,7 @@
 import React from "react";
 
-export default function ProductCard({ product, onAdd }) {
+export default function ProductCard({ product, onAdd, children, isLoading }) {
+
     return (
         <div className="bg-white shadow-md rounded-xl p-6 flex flex-col transition-all duration-300 hover:shadow-xl hover:scale-105">
             <div className="mb-4 flex-shrink-0">
@@ -22,8 +23,9 @@ export default function ProductCard({ product, onAdd }) {
                 </span>
                 <button
                     onClick={() => onAdd(product)}
-                    className="bg-blue-600 text-white px-6 py-2 rounded-lg font-semibold transition-all duration-200 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 active:bg-blue-800">
-                    Add to Cart
+                    disabled={isLoading}
+                    className="bg-blue-600 text-white px-6 py-2 rounded-lg font-semibold transition-all duration-200 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 active:bg-blue-800 disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center min-w-[120px]">
+                    {children || "Add to Cart"}
                 </button>
             </div>
         </div>
