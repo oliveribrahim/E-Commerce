@@ -31,7 +31,7 @@ export function CartProvider({children}) {
 
             const cleanPrev = prev.filter(item => item && item.id && item.purchaseId);
             const existing = prev.find(item => item?.id === product.id);
-
+            
             if (existing) {
                 return cleanPrev.map(item =>
                     item.id === product.id ? {...item, qty: (item.qty || 0) + 1} : item );

@@ -48,7 +48,7 @@ export default function Purchases() {
                                     <button
                                         onClick={() => item.qty > 1 && decrementQty(item.purchaseId)}
                                         className={`px-4 py-2 rounded-lg font-extrabold transition-all duration-200
-    ${item.qty <= 1
+                                                ${item.qty <= 1
                                                 ? "bg-blue-300 text-white cursor-not-allowed hover:bg-blue-400"
                                                 : "bg-blue-600 text-white hover:bg-blue-700"}`}>
                                         -
